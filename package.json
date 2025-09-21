@@ -1,0 +1,19 @@
+{
+  "name": "poss-os-pos",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dist": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.poss-os",
+    "productName": "POSS OS",
+    "win": {
+      "target": "portable"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.2.3",
+    "electron-builder": "^24.9.1"
+  }
+}
