@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session } = require('electron'); // DODAJ "session"
+const { app, BrowserWindow, session } = require('electron');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -6,17 +6,21 @@ function createWindow() {
     height: 600,
   });
 
-  // Dodaj ten kod przed wczytaniem strony
   win.webContents.session.on('select-bluetooth-device', (event, deviceList, callback) => {
     event.preventDefault();
+
+    // Możesz tutaj stworzyć okno dialogowe, aby pokazać listę urządzeń
+    // i pozwolić użytkownikowi wybrać, z którym chce się połączyć.
+    // Na razie, na potrzeby testów, wybierzemy pierwsze urządzenie.
     if (deviceList.length > 0) {
-      // Wybierz pierwsze urządzenie z listy (lub pozwól użytkownikowi wybrać)
-      callback(deviceList[0].deviceId);
+        callback(deviceList[0].deviceId);
+    } else {
+        // Jeśli nie ma urządzeń, poinformuj o tym
+        callback(''); // Brak urządzenia
     }
   });
 
-  win.loadURL('https://poss.ct8.pl'); // Twoja strona
-
+  win.loadURL('https://poss.ct8.pl');
 }
 
 app.whenReady().then(() => {
