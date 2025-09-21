@@ -12,6 +12,8 @@
       "target": "portable"
     }
   },
+  "icon": "build/icon.ico"
+},
   "devDependencies": {
     "electron": "^28.2.3",
     "electron-builder": "^24.9.1"
