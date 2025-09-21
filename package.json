@@ -1,19 +1,18 @@
 {
-  "name": "poss-os-pos",
+  "name": "pos-os-pos",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "dist": "electron-builder --win --x64"
   },
   "build": {
-    "appId": "com.poss-os",
+    "appId": "com.poss-os-pos",
     "productName": "POSS OS",
     "win": {
       "target": "portable"
-    }
+    },
+    "icon": "build/icon.ico"
   },
-  "icon": "build/icon.ico"
-},
   "devDependencies": {
     "electron": "^28.2.3",
     "electron-builder": "^24.9.1"
