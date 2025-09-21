@@ -1,5 +1,4 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+const { app, BrowserWindow, session } = require('electron'); // DODAJ "session"
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -7,7 +6,17 @@ function createWindow() {
     height: 600,
   });
 
-  win.loadURL('https://poss.ct8.pl'); // PAMIĘTAJ: ZMIEŃ TO NA ADRES SWOJEJ STRONY
+  // Dodaj ten kod przed wczytaniem strony
+  win.webContents.session.on('select-bluetooth-device', (event, deviceList, callback) => {
+    event.preventDefault();
+    if (deviceList.length > 0) {
+      // Wybierz pierwsze urządzenie z listy (lub pozwól użytkownikowi wybrać)
+      callback(deviceList[0].deviceId);
+    }
+  });
+
+  win.loadURL('https://poss.ct8.pl'); // Twoja strona
+
 }
 
 app.whenReady().then(() => {
