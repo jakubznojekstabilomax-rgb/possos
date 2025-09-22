@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, session } = require('electron');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -7,32 +7,32 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      webSecurity: false
+      webSecurity: false,
+      bluetooth: true
     }
   });
 
-  // Dodaje funkcję obsługującą zdarzenia związane z Bluetooth.
-  // Dzięki temu okno z listą urządzeń będzie mogło się pojawić.
-  win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    if (permission === 'bluetooth') {
-      callback(true);
-    } else {
-      callback(false);
-    }
-  });
-
+  // Ten fragment kodu pozwala na komunikację z urządzeniami Bluetooth
   win.webContents.session.on('select-bluetooth-device', (event, deviceList, callback) => {
     event.preventDefault();
     if (deviceList.length > 0) {
-      // Wybierz pierwsze urządzenie z listy. W bardziej zaawansowanej wersji,
-      // tutaj mógłbyś wyświetlić okno dialogowe z listą urządzeń.
+      // Wybierz pierwsze urządzenie z listy.
       callback(deviceList[0].deviceId);
     } else {
       callback('');
     }
   });
 
-  // Załaduj Twoją stronę internetową. Pamiętaj, aby zmienić adres URL!
+  // Dodatkowo, ten kod pozwala na wyświetlanie okna dialogowego z listą urządzeń Bluetooth
+  win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+    if (permission === 'bluetooth') {
+      callback(true); // Zezwól na dostęp do Bluetooth
+    } else {
+      callback(false); // Zablokuj inne uprawnienia
+    }
+  });
+
+  // Załadowanie Twojej strony internetowej. Adres URL jest już zmieniony!
   win.loadURL('https://poss.ct8.pl');
 }
 
