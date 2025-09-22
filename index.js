@@ -8,7 +8,11 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       webSecurity: false,
-      bluetooth: true
+      bluetooth: true,
+      // Dodatkowe, maksymalne uprawnienia
+      enableRemoteModule: true,
+      sandbox: false,
+      enableBlinkFeatures: 'WebBluetooth'
     }
   });
 
@@ -32,7 +36,7 @@ function createWindow() {
     }
   });
 
-  // Załadowanie Twojej strony internetowej. Adres URL jest już zmieniony!
+  // Załadowanie Twojej strony internetowej
   win.loadURL('https://poss.ct8.pl');
 }
 
