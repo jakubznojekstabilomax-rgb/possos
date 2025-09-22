@@ -1,5 +1,5 @@
 {
-  "name": "pos-os-pos",
+  "name": "poss-os",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "win": {
       "target": "portable"
     },
-    "icon": "build/favicon.ico"
+    "icon": "build/favicon.ico",
     "artifactName": "${productName} Installer.${ext}"
   },
   "devDependencies": {
