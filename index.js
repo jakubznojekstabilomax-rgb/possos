@@ -5,38 +5,31 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
       webSecurity: false,
       bluetooth: true,
-      // Dodatkowe, maksymalne uprawnienia
-      enableRemoteModule: true,
-      sandbox: false,
-      enableBlinkFeatures: 'WebBluetooth'
+      enableRemoteModule: false
     }
   });
 
-  // Ten fragment kodu pozwala na komunikację z urządzeniami Bluetooth
   win.webContents.session.on('select-bluetooth-device', (event, deviceList, callback) => {
     event.preventDefault();
     if (deviceList.length > 0) {
-      // Wybierz pierwsze urządzenie z listy.
       callback(deviceList[0].deviceId);
     } else {
       callback('');
     }
   });
 
-  // Dodatkowo, ten kod pozwala na wyświetlanie okna dialogowego z listą urządzeń Bluetooth
   win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
     if (permission === 'bluetooth') {
-      callback(true); // Zezwól na dostęp do Bluetooth
+      callback(true);
     } else {
-      callback(false); // Zablokuj inne uprawnienia
+      callback(false);
     }
   });
 
-  // Załadowanie Twojej strony internetowej
   win.loadURL('https://poss.ct8.pl');
 }
 
