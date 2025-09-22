@@ -11,7 +11,7 @@
     "win": {
       "target": "portable"
     },
-    "icon": "build/icon.ico"
+    "icon": "build/favicon.ico"
   },
   "devDependencies": {
     "electron": "^28.2.3",
