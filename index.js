@@ -8,8 +8,17 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: false,
-      bluetooth: true,
+      bluetooth: true, // Zapewnia dostęp do API Bluetooth
       enableRemoteModule: false
+    }
+  });
+
+  // Dodaj tę funkcję, aby umożliwić dostęp do Bluetooth
+  win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+    if (permission === 'bluetooth') {
+      callback(true); // Zawsze zezwalaj na dostęp do Bluetooth
+    } else {
+      callback(false);
     }
   });
 
@@ -19,14 +28,6 @@ function createWindow() {
       callback(deviceList[0].deviceId);
     } else {
       callback('');
-    }
-  });
-
-  win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    if (permission === 'bluetooth') {
-      callback(true);
-    } else {
-      callback(false);
     }
   });
 
