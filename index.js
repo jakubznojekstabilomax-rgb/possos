@@ -1,51 +1,68 @@
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const usb = require('usb'); // Dodana biblioteka do obsługi USB
 
 function createWindow() {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      webSecurity: false,
-      bluetooth: true, // Zapewnia dostęp do API Bluetooth
-      enableRemoteModule: false
-    }
-  });
+    const mainWindow = new BrowserWindow({
+        width: 1000,
+        height: 800,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
 
-  // Dodaj tę funkcję, aby umożliwić dostęp do Bluetooth
-  win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    if (permission === 'bluetooth') {
-      callback(true); // Zawsze zezwalaj na dostęp do Bluetooth
-    } else {
-      callback(false);
-    }
-  });
+    // Zamiast ładować zdalną stronę, ładujemy lokalny plik
+    mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  win.webContents.session.on('select-bluetooth-device', (event, deviceList, callback) => {
-    event.preventDefault();
-    if (deviceList.length > 0) {
-      callback(deviceList[0].deviceId);
-    } else {
-      callback('');
-    }
-  });
+    // Opcjonalnie, otworzenie narzędzi deweloperskich
+    mainWindow.webContents.openDevTools();
 
-  win.loadURL('https://poss.ct8.pl');
+    // Dodanie logiki obsługującej komunikację z drukarką USB
+    ipcMain.on('print-receipt', async (event, receiptData) => {
+        // Tutaj umieścimy logikę drukowania na drukarce USB
+        // Założenie: receiptData zawiera dane do wydrukowania
+        console.log("Otrzymano żądanie wydruku!");
+
+        try {
+            // Logika połączenia i drukowania przez USB
+            const devices = usb.getDeviceList();
+            const printer = devices.find(d => d.deviceDescriptor.idVendor === 0x04b8); // vendorId drukarki
+            if (!printer) {
+                console.error("Nie znaleziono drukarki USB.");
+                return;
+            }
+
+            printer.open();
+            printer.interfaces[0].claim();
+            const endpoint = printer.interfaces[0].endpoints[0];
+
+            // Wysyłanie danych do drukarki
+            const data = Buffer.from(receiptData, 'utf-8');
+            endpoint.transfer(data, (err) => {
+                if (err) {
+                    console.error("Błąd drukowania:", err);
+                    event.sender.send('print-status', { success: false, error: err.message });
+                } else {
+                    console.log("Wydrukowano pomyślnie!");
+                    event.sender.send('print-status', { success: true });
+                }
+                printer.close();
+            });
+
+        } catch (error) {
+            console.error("Błąd połączenia z drukarką USB:", error);
+            event.sender.send('print-status', { success: false, error: error.message });
+        }
+    });
 }
 
 app.whenReady().then(() => {
-  createWindow();
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+    createWindow();
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
