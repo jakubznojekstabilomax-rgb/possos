@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
 
 function createWindow() {
@@ -6,27 +6,16 @@ function createWindow() {
         width: 1000,
         height: 800,
         webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true, // Zostawiamy włączone, to jest bezpieczniejsze
             preload: path.join(__dirname, 'preload.js'),
-            nodeIntegration: true,
-            contextIsolation: false
         }
     });
 
+    // Ładujemy lokalny plik HTML, który zawiera ramkę z Twoją stroną
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-    // Ustawienie obsługi zdarzenia połączenia Bluetooth
-    mainWindow.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
-        event.preventDefault();
-        
-        if (deviceList.length > 0) {
-            // W tym uproszczonym przykładzie wybieramy pierwsze urządzenie z listy
-            callback(deviceList[0].deviceId);
-        } else {
-            callback('');
-        }
-    });
-
-    // Ustawienie obsługi żądania uprawnień dla Bluetooth
+    // Ustawiamy obsługę żądania Bluetooth
     mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
         if (permission === 'bluetooth') {
             callback(true);
@@ -35,8 +24,15 @@ function createWindow() {
         }
     });
 
-    // Opcjonalnie: Otwórz narzędzia deweloperskie
-    // mainWindow.webContents.openDevTools();
+    // Ustawiamy obsługę zdarzenia połączenia z urządzeniem
+    mainWindow.webContents.session.on('select-bluetooth-device', (event, deviceList, callback) => {
+        event.preventDefault();
+        if (deviceList.length > 0) {
+            callback(deviceList[0].deviceId);
+        } else {
+            callback('');
+        }
+    });
 }
 
 app.whenReady().then(() => {
